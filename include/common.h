@@ -23,14 +23,21 @@ using u64 = uint64_t;
 using f32 = float;
 using f64 = double;
 
+struct FileBuffer {
+    size_t size;
+    char* raw;
+};
 // meh
-[[nodiscard]] static std::string read_file(const std::string& filepath) {
-    std::ifstream file;
-    file.open(filepath);
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    file.close();
-    return std::string(buffer.str());
+[[nodiscard]] static FileBuffer read_file(const std::string& filepath) {
+    FileBuffer buffer;
+    std::ifstream t(filepath, std::ios::binary);
+    t.seekg(0, std::ios::end);
+    buffer.size = t.tellg();
+    buffer.raw = new char[buffer.size];
+    t.seekg(0);
+    t.read(buffer.raw, buffer.size); 
+
+    return buffer;
 }
 
 #endif // MINI_JVM_COMMON_H

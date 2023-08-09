@@ -12,6 +12,63 @@ inline bool version_is_supported(u16 minor_version, u16 major_version) {
     return false;
 }
 
+enum class BaseType: u8 {
+    Byte,
+    Char,
+    Double,
+    Float,
+    Int,
+    Long,
+    Short,
+    Boolean
+};
+
+// TODO point to intern string
+struct ObjectType {
+    u8* class_name;
+    u16 length;
+};
+
+// FIXME this is dumb
+struct FieldType;
+struct ArrayType {
+    u8 dimensions;
+    FieldType* component_type;
+};
+
+enum class FieldTypeTag: u8 {
+    BaseType,
+    ObjectType,
+    ArrayType,
+};
+
+struct FieldType {
+    FieldTypeTag tag;
+    union {
+        BaseType base_type;
+        ObjectType object_type;
+        ArrayType array_type;
+    };
+};
+
+struct FieldDescriptor {
+    FieldType field;
+};
+
+struct ParameterDescriptor {
+    FieldType type;
+};
+
+struct ReturnDescriptor {
+    bool is_void;
+    FieldType type;
+};
+
+struct MethodDescriptor {
+    std::vector<ParameterDescriptor> parameter_types;
+    ReturnDescriptor return_type;
+};
+
 enum CPInfoTag: u8 {
     Utf8               = 1,
     Integer            = 3,
@@ -672,6 +729,7 @@ enum class MethodInfoAccessFlags: u16 {
 
 // https://docs.oracle.com/javase/specs/jvms/se20/html/jvms-4.html#jvms-4.6
 struct MethodInfo {
+    MethodDescriptor parsed_method;
     u16 access_flags;
     u16 name_index;
     u16 descriptor_index;
@@ -718,12 +776,18 @@ public:
     u16 attributes_count;
     AttributeInfo* attributes;
 private:
-    bool load_constant_pool(std::string& bytes, i32& index);
-    bool load_interfaces(std::string& bytes, i32& index);
-    bool load_fields(std::string& bytes, i32& index);
-    bool load_methods(std::string& bytes, i32& index);
-    AttributeResult load_attributes(Location loc, std::string& bytes, i32& index);
-    ExceptionTableResult load_exception_table(std::string& bytes, i32& index);
+    bool load_constant_pool(FileBuffer& bytes, i32& index);
+    bool load_interfaces(FileBuffer& bytes, i32& index);
+    bool load_fields(FileBuffer& bytes, i32& index);
+    bool load_methods(FileBuffer& bytes, i32& index);
+    AttributeResult load_attributes(Location loc, FileBuffer& bytes, i32& index);
+    ExceptionTableResult load_exception_table(FileBuffer& bytes, i32& index);
+    
+    FieldType parse_field_type(u8* bytes, u16 length, u16& index);
+    FieldDescriptor parse_field_descriptor(u8* bytes, u16 length, u16& index);
+    ParameterDescriptor parse_parameter_descriptor(u8* bytes, u16 length, u16& index);
+    ReturnDescriptor parse_return_descriptor(u8* bytes, u16 length, u16& index);
+    MethodDescriptor parse_method_descriptor(u8* bytes, u16 length);
 
 };
 
