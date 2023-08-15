@@ -1,6 +1,10 @@
-#include "class_file.h"
+#include "class_loader.h"
+#include "vm.h"
 
-int main() {
-    ClassFile file;
-    file.parse_file("C:/Users/Kirin/OneDrive/Desktop/mini-jvm/java_stuff/Main.class");
+int main(int argc, char* argv[]) {
+    ClassLoader loader;
+    auto java_class = loader.load(argv[1]);
+
+
+
 }

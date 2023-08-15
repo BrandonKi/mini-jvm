@@ -9,7 +9,9 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 add_library(mjvm_lib OBJECT
     ${CMAKE_CURRENT_SOURCE_DIR}/src/class_file.cpp	
-
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/class_loader.cpp	
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bl_interp.cpp	
 )
 
 target_include_directories(mjvm_lib

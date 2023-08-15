@@ -69,7 +69,7 @@ struct MethodDescriptor {
     ReturnDescriptor return_type;
 };
 
-enum CPInfoTag: u8 {
+enum class CPInfoTag: u8 {
     Utf8               = 1,
     Integer            = 3,
     Float              = 4,
